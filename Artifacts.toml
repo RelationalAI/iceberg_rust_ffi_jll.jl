@@ -1,0 +1,17 @@
+[[iceberg_rust_ffi]]
+arch = "x86_64"
+git-tree-sha1 = "5970fd65d3ea8d73c0491b35fcdb3d94aa8205c4"
+libc = "glibc"
+os = "linux"
+
+    [[iceberg_rust_ffi.download]]
+    sha256 = "680215aae0ce2d06fa8ce184e48ca0d7f6de660063a40151a300a7cc6198aa3a"
+    url = "https://github.com/local/releases/download/iceberg_rust_ffi-v0.1.0+0/iceberg_rust_ffi.v0.1.0.x86_64-linux-gnu.tar.gz"
+[[iceberg_rust_ffi]]
+arch = "aarch64"
+git-tree-sha1 = "f5202bdb3704e2c4c461c51ce4e5a1a90000c650"
+os = "macos"
+
+    [[iceberg_rust_ffi.download]]
+    sha256 = "b62207f943deabcbc34995e35c2d17cae1c0f1376896a190c8c1b0d67719055f"
+    url = "https://github.com/local/releases/download/iceberg_rust_ffi-v0.1.0+0/iceberg_rust_ffi.v0.1.0.aarch64-apple-darwin.tar.gz"
