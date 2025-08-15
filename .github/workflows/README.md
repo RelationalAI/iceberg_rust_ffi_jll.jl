@@ -1,6 +1,6 @@
 # Build and Deploy Workflow
 
-This workflow allows you to manually trigger the building and deployment of tarballs for the `iceberg_rust_ffi_jll` package.
+This workflow allows you to manually trigger the building and deployment of tarballs for the `iceberg_rust_ffi_jll` package. It creates a new branch with the specified name and updates the version in `build_tarballs.jl`.
 
 ## Usage
 
@@ -8,20 +8,27 @@ This workflow allows you to manually trigger the building and deployment of tarb
 2. Select **Build and Deploy Tarballs** from the workflows list
 3. Click **Run workflow**
 4. Fill in the parameters:
-   - **target_branch**: The branch to build and deploy from (default: `main`, but deployment to `main` is not allowed)
+   - **branch_name**: Name for the new branch to create (must not exist)
+   - **base_version**: Base version to use (e.g., "0.1.0")
    - **targets**: Target platforms to build for, comma-separated (default: `x86_64-linux-gnu`)
-   - **version**: Optional version to build (if not specified, uses current version)
 
-**Note**: For safety reasons, deployment to the `main` branch is not allowed. Please use a feature branch or release branch instead.
+**Note**: The workflow will create a new branch and fail if a branch with the same name already exists.
 
 ## Parameters
 
-### target_branch
-- **Description**: Branch to build and deploy from
+### branch_name
+- **Description**: Name for the new branch to create (must not exist)
 - **Required**: Yes
-- **Default**: `main`
 - **Type**: String
-- **Note**: Deployment to `main` branch is not allowed for safety reasons. Please use a different branch.
+- **Examples**: `feature/new-version`, `release/v0.2.0`, `hotfix/bug-fix`
+- **Note**: The workflow will fail if a branch with this name already exists.
+
+### base_version
+- **Description**: Base version to use (e.g., "0.1.0")
+- **Required**: Yes
+- **Type**: String
+- **Examples**: `0.1.0`, `0.2.0`, `1.0.0`
+- **Note**: The final version will be `{base_version}-{branch_name}`
 
 ### targets
 - **Description**: Target platforms to build for (comma-separated)
@@ -32,22 +39,18 @@ This workflow allows you to manually trigger the building and deployment of tarb
   - `x86_64-linux-gnu` (single target)
   - `x86_64-linux-gnu,aarch64-apple-darwin` (multiple targets)
 
-### version
-- **Description**: Version to build (optional, will use current version if not specified)
-- **Required**: No
-- **Type**: String
-- **Examples**: `0.1.0`, `0.2.0-alpha`
-
 ## What the workflow does
 
-1. **Checkout**: Checks out the specified branch
-2. **Setup Julia**: Sets up Julia 1.10 environment
-3. **Install dependencies**: Installs project dependencies
-4. **Show version**: Displays the current version being built
-5. **Build tarballs**: Runs `build_tarballs.jl` with the specified parameters
-6. **Update Artifacts.toml**: Updates the Artifacts.toml file with new tarball URLs
-7. **Show updated file**: Displays the updated Artifacts.toml contents
-8. **Commit and push**: Commits the updated Artifacts.toml to the specified branch
+1. **Checkout**: Checks out the main branch
+2. **Validate branch name**: Ensures the new branch name doesn't exist and isn't "main"
+3. **Create new branch**: Creates and checks out a new branch with the specified name
+4. **Setup Julia**: Sets up Julia 1.7.3 environment
+5. **Install dependencies**: Installs project dependencies
+6. **Update version**: Updates `build_tarballs.jl` with version `{base_version}-{branch_name}`
+7. **Build tarballs**: Runs `build_tarballs.jl` with the updated version
+8. **Update Artifacts.toml**: Updates the Artifacts.toml file with new tarball URLs
+9. **Show updated file**: Displays the updated Artifacts.toml contents
+10. **Commit and push**: Commits both `build_tarballs.jl` and `Artifacts.toml` to the new branch
 
 ## Supported platforms
 

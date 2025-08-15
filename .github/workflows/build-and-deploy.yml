@@ -3,19 +3,18 @@ name: Build and Deploy Tarballs
 on:
   workflow_dispatch:
     inputs:
-      target_branch:
-        description: 'Branch to build and deploy from'
+      branch_name:
+        description: 'Name for the new branch to create (must not exist)'
         required: true
-        default: 'main'
+        type: string
+      base_version:
+        description: 'Base version to use (e.g., "0.1.0")'
+        required: true
         type: string
       targets:
         description: 'Target platforms to build for (comma-separated)'
         required: false
         default: 'x86_64-linux-gnu'
-        type: string
-      version:
-        description: 'Version to build (optional, will use current version if not specified)'
-        required: false
         type: string
 
 jobs:
@@ -26,20 +25,33 @@ jobs:
       packages: write
     
     steps:
-    - name: Validate target branch
-      run: |
-        if [ "${{ github.event.inputs.target_branch }}" = "main" ]; then
-          echo "Error: Deployment to main branch is not allowed for safety reasons."
-          echo "Please use a different branch for deployment."
-          exit 1
-        fi
-        echo "Target branch validation passed: ${{ github.event.inputs.target_branch }}"
-
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.target_branch }}
+        ref: main
         token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Validate branch name
+      run: |
+        branch_name="${{ github.event.inputs.branch_name }}"
+        if [ "$branch_name" = "main" ]; then
+          echo "Error: Cannot create a branch named 'main'."
+          exit 1
+        fi
+        
+        # Check if branch already exists
+        if git ls-remote --heads origin "$branch_name" | grep -q "$branch_name"; then
+          echo "Error: Branch '$branch_name' already exists. Please choose a different branch name."
+          exit 1
+        fi
+        
+        echo "Branch name validation passed: $branch_name"
+
+    - name: Create and checkout new branch
+      run: |
+        branch_name="${{ github.event.inputs.branch_name }}"
+        git checkout -b "$branch_name"
+        echo "Created and checked out branch: $branch_name"
 
     - name: Setup Julia
       uses: julia-actions/setup-julia@v1
@@ -50,19 +62,24 @@ jobs:
       run: |
         julia --project=. -e 'using Pkg; Pkg.instantiate()'
 
-    - name: Show current version
+    - name: Update build_tarballs.jl with new version
       run: |
-        julia --project=. -e 'using Pkg; println("Current version: ", Pkg.project().version)'
+        branch_name="${{ github.event.inputs.branch_name }}"
+        base_version="${{ github.event.inputs.base_version }}"
+        new_version="${base_version}-${branch_name}"
+        
+        echo "Updating build_tarballs.jl with version: $new_version"
+        
+        # Update the version line in build_tarballs.jl
+        sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" build_tarballs.jl
+        
+        echo "Updated build_tarballs.jl:"
+        grep "version = v" build_tarballs.jl
 
     - name: Build tarballs
       run: |
-        if [ -n "${{ github.event.inputs.version }}" ]; then
-          echo "Building for version: ${{ github.event.inputs.version }}"
-          julia --project=. build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }} --version ${{ github.event.inputs.version }}
-        else
-          echo "Building for current version"
-          julia --project=. build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }}
-        fi
+        echo "Building tarballs with updated version"
+        julia --project=. build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }}
       env:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
@@ -85,10 +102,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add Artifacts.toml
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "Update Artifacts.toml with new tarball URLs"
-          git push origin ${{ github.event.inputs.target_branch }}
-        fi 
+        git add Artifacts.toml build_tarballs.jl
+        git commit -m "Update build_tarballs.jl version and Artifacts.toml with new tarball URLs"
+        git push origin ${{ github.event.inputs.branch_name }} 
