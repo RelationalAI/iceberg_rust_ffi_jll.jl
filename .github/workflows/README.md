@@ -14,6 +14,16 @@ This workflow allows you to manually trigger the building and deployment of tarb
 
 **Note**: The workflow will create a new branch and fail if a branch with the same name already exists.
 
+## What gets updated in build_tarballs.jl
+
+The workflow updates two fields in `build_tarballs.jl`:
+
+1. **Version field**: `version = v"{base_version}-{branch_name}"`
+   - Example: If base_version is "0.1.0" and branch_name is "feature/new-version", it becomes `version = v"0.1.0-feature/new-version"`
+
+2. **GitSource commit SHA**: Updates the commit SHA in the GitSource line to the current commit
+   - Example: `GitSource("https://github.com/RelationalAI/iceberg_rust_ffi.git", "abc123...")` gets updated with the current commit SHA
+
 ## Parameters
 
 ### branch_name
@@ -46,8 +56,8 @@ This workflow allows you to manually trigger the building and deployment of tarb
 3. **Create new branch**: Creates and checks out a new branch with the specified name
 4. **Setup Julia**: Sets up Julia 1.7.3 environment
 5. **Install dependencies**: Installs project dependencies
-6. **Update version**: Updates `build_tarballs.jl` with version `{base_version}-{branch_name}`
-7. **Build tarballs**: Runs `build_tarballs.jl` with the updated version
+6. **Update version and commit SHA**: Updates `build_tarballs.jl` with version `{base_version}-{branch_name}` and current commit SHA
+7. **Build tarballs**: Runs `build_tarballs.jl` with the updated version and commit SHA
 8. **Update Artifacts.toml**: Updates the Artifacts.toml file with new tarball URLs
 9. **Show updated file**: Displays the updated Artifacts.toml contents
 10. **Commit and push**: Commits both `build_tarballs.jl` and `Artifacts.toml` to the new branch

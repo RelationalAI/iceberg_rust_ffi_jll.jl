@@ -62,19 +62,29 @@ jobs:
       run: |
         julia --project=. -e 'using Pkg; Pkg.instantiate()'
 
-    - name: Update build_tarballs.jl with new version
+    - name: Update build_tarballs.jl with new version and commit SHA
       run: |
         branch_name="${{ github.event.inputs.branch_name }}"
         base_version="${{ github.event.inputs.base_version }}"
         new_version="${base_version}-${branch_name}"
         
-        echo "Updating build_tarballs.jl with version: $new_version"
+        # Get the current commit SHA
+        commit_sha=$(git rev-parse HEAD)
+        echo "Current commit SHA: $commit_sha"
+        
+        echo "Updating build_tarballs.jl with version: $new_version and commit SHA: $commit_sha"
         
         # Update the version line in build_tarballs.jl
         sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" build_tarballs.jl
         
+        # Update the GitSource commit SHA in build_tarballs.jl
+        sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"$commit_sha\")/" build_tarballs.jl
+        
         echo "Updated build_tarballs.jl:"
+        echo "Version:"
         grep "version = v" build_tarballs.jl
+        echo "GitSource:"
+        grep "GitSource" build_tarballs.jl
 
     - name: Build tarballs
       run: |
