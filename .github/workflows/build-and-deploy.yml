@@ -71,7 +71,7 @@ jobs:
         branch_name="${{ github.event.inputs.branch_name }}"
         base_version="${{ github.event.inputs.base_version }}"
         commit_sha="${{ github.event.inputs.commit_sha }}"
-        new_version="${base_version}-${branch_name}"
+        new_version="${base_version}"
         
         echo "Using provided commit SHA: $commit_sha"
         
@@ -97,7 +97,7 @@ jobs:
     - name: Build tarballs
       run: |
         echo "Building tarballs with updated version"
-        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }}
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" ${{ github.event.inputs.targets }}
       env:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
