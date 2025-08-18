@@ -11,6 +11,10 @@ on:
         description: 'Base version to use (e.g., "0.1.0")'
         required: true
         type: string
+      commit_sha:
+        description: 'Commit SHA to use for the build (e.g., "abc123...")'
+        required: true
+        type: string
       targets:
         description: 'Target platforms to build for (comma-separated)'
         required: false
@@ -66,11 +70,10 @@ jobs:
       run: |
         branch_name="${{ github.event.inputs.branch_name }}"
         base_version="${{ github.event.inputs.base_version }}"
+        commit_sha="${{ github.event.inputs.commit_sha }}"
         new_version="${base_version}-${branch_name}"
         
-        # Get the current commit SHA
-        commit_sha=$(git rev-parse HEAD)
-        echo "Current commit SHA: $commit_sha"
+        echo "Using provided commit SHA: $commit_sha"
         
         echo "Updating build_tarballs.jl with version: $new_version and commit SHA: $commit_sha"
         
@@ -85,6 +88,11 @@ jobs:
         grep "version = v" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
         echo "GitSource:"
         grep "GitSource" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
+
+    - name: Show full build_tarballs.jl contents
+      run: |
+        echo "Full contents of build_tarballs.jl:"
+        cat iceberg_rust_ffi_binarybuilder/build_tarballs.jl
 
     - name: Build tarballs
       run: |
