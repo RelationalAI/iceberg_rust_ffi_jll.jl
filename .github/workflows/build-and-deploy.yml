@@ -29,6 +29,15 @@ jobs:
       packages: write
     
     steps:
+    - name: Print workflow inputs
+      run: |
+        echo "=== Workflow Inputs ==="
+        echo "Branch name: ${{ github.event.inputs.branch_name }}"
+        echo "Base version: ${{ github.event.inputs.base_version }}"
+        echo "Commit SHA: ${{ github.event.inputs.commit_sha }}"
+        echo "Targets: ${{ github.event.inputs.targets }}"
+        echo "======================"
+
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
