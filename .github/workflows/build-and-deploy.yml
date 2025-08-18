@@ -122,11 +122,6 @@ jobs:
         
         echo "Successfully updated Artifacts.toml with version $version"
 
-    - name: Show updated Artifacts.toml
-      run: |
-        echo "Updated Artifacts.toml contents:"
-        cat Artifacts.toml
-
     - name: Commit and push changes
       run: |
         git config --local user.email "action@github.com"
