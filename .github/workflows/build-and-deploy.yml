@@ -97,7 +97,7 @@ jobs:
     - name: Build tarballs
       run: |
         echo "Building tarballs with updated version"
-        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll.jl" ${{ github.event.inputs.targets }} --skip-build
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll.jl" ${{ github.event.inputs.targets }}
       env:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true

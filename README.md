@@ -7,4 +7,6 @@ The custom version is intended for internal use when you want to build a custom 
 * Deploy a new release. Make sure to pass in unique version number to the GitHub workflow.
 * Produce a new branch with JLLWrappers around the artifacts in that release
 
+The workflow will require device-code authentication, so monitor logs for a short time to be able to do authenticate in the "Build tarballs" step.
+
 To later use this, just reference this repostitory from your Julia, and the commit from the newly produced branch.
