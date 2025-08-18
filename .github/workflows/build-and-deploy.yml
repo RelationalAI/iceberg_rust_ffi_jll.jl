@@ -118,7 +118,7 @@ jobs:
         echo "Detected version: $version"
 
         echo "Building JLL"
-        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-jll="local" ${{ github.event.inputs.targets }}
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-jll="local" ${{ github.event.inputs.targets }} --skip-build
 
         cp ~/.julia/dev/iceberg_rust_ffi_jll/Artifacts.toml Artifacts.toml
 
