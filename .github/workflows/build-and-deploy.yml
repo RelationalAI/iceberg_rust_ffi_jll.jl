@@ -102,11 +102,6 @@ jobs:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
 
-    - name: Show updated Artifacts.toml
-      run: |
-        echo "Updated Artifacts.toml contents:"
-        cat Artifacts.toml
-
     - name: Update Artifacts.toml with new release URLs and hashes
       run: |
         # Get the version from the build_tarballs.jl file
@@ -126,6 +121,11 @@ jobs:
         cat Artifacts.toml
         
         echo "Successfully updated Artifacts.toml with version $version"
+
+    - name: Show updated Artifacts.toml
+      run: |
+        echo "Updated Artifacts.toml contents:"
+        cat Artifacts.toml
 
     - name: Commit and push changes
       run: |
