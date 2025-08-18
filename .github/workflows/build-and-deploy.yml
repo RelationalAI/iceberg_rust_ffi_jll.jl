@@ -97,24 +97,22 @@ jobs:
     - name: Build tarballs
       run: |
         echo "Building tarballs with updated version"
-        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll.jl" ${{ github.event.inputs.targets }}
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll.jl" ${{ github.event.inputs.targets }} --skip-build
       env:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
-
-    - name: Update Artifacts.toml
-      run: |
-        julia --project=iceberg_rust_ffi_binarybuilder -e '
-        using Pkg
-        Pkg.add("BinaryBuilder")
-        using BinaryBuilder
-        BinaryBuilder.update_Artifacts_toml("Artifacts.toml")
-        '
 
     - name: Show updated Artifacts.toml
       run: |
         echo "Updated Artifacts.toml contents:"
         cat Artifacts.toml
+
+    - name: Update Artifacts.toml
+      run: |
+        julia --project=iceberg_rust_ffi_binarybuilder -e '
+        using BinaryBuilder
+        BinaryBuilder.download_verify("Artifacts.toml")
+        '
 
     - name: Commit and push changes
       run: |
