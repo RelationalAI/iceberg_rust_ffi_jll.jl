@@ -1,0 +1,7 @@
+name = "iceberg_rust_ffi_binarybuilder"
+uuid = "fff50055-5602-464f-91e7-36364e1698a2"
+authors = ["Vukasin Stefanovic <vukasin.stefanovic92@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+BinaryBuilder = "12aac903-9f7c-5d81-afc2-d9565ea332ae"

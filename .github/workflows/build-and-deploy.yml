@@ -60,7 +60,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        julia -e 'using Pkg; Pkg.instantiate()'
+        julia --project=iceberg_rust_ffi_binarybuilder -e 'using Pkg; Pkg.instantiate()'
 
     - name: Update build_tarballs.jl with new version and commit SHA
       run: |
@@ -75,28 +75,28 @@ jobs:
         echo "Updating build_tarballs.jl with version: $new_version and commit SHA: $commit_sha"
         
         # Update the version line in build_tarballs.jl
-        sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" build_tarballs.jl
+        sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
         
         # Update the GitSource commit SHA in build_tarballs.jl
-        sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"$commit_sha\")/" build_tarballs.jl
+        sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"$commit_sha\")/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
         
         echo "Updated build_tarballs.jl:"
         echo "Version:"
-        grep "version = v" build_tarballs.jl
+        grep "version = v" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
         echo "GitSource:"
-        grep "GitSource" build_tarballs.jl
+        grep "GitSource" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
 
     - name: Build tarballs
       run: |
         echo "Building tarballs with updated version"
-        julia --project=. build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }}
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-bin="RelationalAI/iceberg_rust_ffi_jll" --targets ${{ github.event.inputs.targets }}
       env:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
 
     - name: Update Artifacts.toml
       run: |
-        julia --project=. -e '
+        julia --project=iceberg_rust_ffi_binarybuilder -e '
         using Pkg
         Pkg.add("BinaryBuilder")
         using BinaryBuilder
@@ -112,6 +112,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add Artifacts.toml build_tarballs.jl
+        git add Artifacts.toml iceberg_rust_ffi_binarybuilder/build_tarballs.jl
         git commit -m "Update build_tarballs.jl version and Artifacts.toml with new tarball URLs"
         git push origin ${{ github.event.inputs.branch_name }} 
