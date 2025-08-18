@@ -129,7 +129,7 @@ jobs:
           echo "x86_64-linux-gnu found in targets, updating Artifacts.toml"
           X86_64_URL="https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v${version}%2B0/iceberg_rust_ffi.v${version}.x86_64-linux-gnu.tar.gz"
           sed -i.tmp \
-              -e "s|https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.x86_64-linux-gnu.tar.gz|$X86_64_URL|g" \
+              -e "/x86_64-linux-gnu.tar.gz/s|url = \".*\"|url = \"$X86_64_URL\"|" \
               "Artifacts.toml"
         else
           echo "x86_64-linux-gnu not in targets, skipping Artifacts.toml update for this platform"
@@ -140,7 +140,7 @@ jobs:
           echo "aarch64-apple-darwin found in targets, updating Artifacts.toml"
           AARCH64_URL="https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v${version}%2B0/iceberg_rust_ffi.v${version}.aarch64-apple-darwin.tar.gz"
           sed -i.tmp \
-              -e "s|https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.aarch64-apple-darwin.tar.gz|$AARCH64_URL|g" \
+              -e "/aarch64-apple-darwin.tar.gz/s|url = \".*\"|url = \"$AARCH64_URL\"|" \
               "Artifacts.toml"
         else
           echo "aarch64-apple-darwin not in targets, skipping Artifacts.toml update for this platform"
