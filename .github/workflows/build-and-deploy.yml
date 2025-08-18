@@ -107,12 +107,25 @@ jobs:
         echo "Updated Artifacts.toml contents:"
         cat Artifacts.toml
 
-    - name: Update Artifacts.toml
+    - name: Update Artifacts.toml with new release URLs and hashes
       run: |
-        julia --project=iceberg_rust_ffi_binarybuilder -e '
-        using BinaryBuilder
-        BinaryBuilder.download_verify("Artifacts.toml")
-        '
+        # Get the version from the build_tarballs.jl file
+        version=$(grep 'version = v"' iceberg_rust_ffi_binarybuilder/build_tarballs.jl | sed 's/.*version = v"\([^"]*\)".*/\1/')
+        echo "Detected version: $version"
+        
+        # Run the workflow-specific update script
+        cd iceberg_rust_ffi_binarybuilder
+        chmod +x update_artifacts_workflow.sh
+        
+        # Run the update script with the detected version
+        ./update_artifacts_workflow.sh "$version"
+        
+        # Verify the update was successful
+        cd ..
+        echo "Updated Artifacts.toml contents:"
+        cat Artifacts.toml
+        
+        echo "Successfully updated Artifacts.toml with version $version"
 
     - name: Commit and push changes
       run: |
