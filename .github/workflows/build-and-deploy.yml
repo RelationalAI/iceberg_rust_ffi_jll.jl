@@ -107,19 +107,40 @@ jobs:
         # Get the version from the build_tarballs.jl file
         version=$(grep 'version = v"' iceberg_rust_ffi_binarybuilder/build_tarballs.jl | sed 's/.*version = v"\([^"]*\)".*/\1/')
         echo "Detected version: $version"
+
+        echo "Building JLL"
+        julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-jll="local" ${{ github.event.inputs.targets }}
+
+        cp ~/.julia/dev/iceberg_rust_ffi_jll/Artifacts.toml Artifacts.toml
+
+        targets="${{ github.event.inputs.targets }}"
         
-        # Run the workflow-specific update script
-        cd iceberg_rust_ffi_binarybuilder
-        chmod +x update_artifacts_workflow.sh
-        
-        # Run the update script with the detected version
-        ./update_artifacts_workflow.sh "$version"
-        
+        # Check if x86_64-linux-gnu is in targets and apply sed if it is
+        if echo "$targets" | grep -q "x86_64-linux-gnu"; then
+          echo "x86_64-linux-gnu found in targets, updating Artifacts.toml"
+          X86_64_URL="https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v${version}%2B0/iceberg_rust_ffi.v${version}.x86_64-linux-gnu.tar.gz"
+          sed -i.tmp \
+              -e "s|https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.x86_64-linux-gnu.tar.gz|$X86_64_URL|g" \
+              "Artifacts.toml"
+        else
+          echo "x86_64-linux-gnu not in targets, skipping Artifacts.toml update for this platform"
+        fi
+
+        # Check if aarch64-apple-darwin is in targets and apply sed if it is
+        if echo "$targets" | grep -q "aarch64-apple-darwin"; then
+          echo "aarch64-apple-darwin found in targets, updating Artifacts.toml"
+          AARCH64_URL="https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v${version}%2B0/iceberg_rust_ffi.v${version}.aarch64-apple-darwin.tar.gz"
+          sed -i.tmp \
+              -e "s|https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.aarch64-apple-darwin.tar.gz|$AARCH64_URL|g" \
+              "Artifacts.toml"
+        else
+          echo "aarch64-apple-darwin not in targets, skipping Artifacts.toml update for this platform"
+        fi
+
         # Verify the update was successful
-        cd ..
         echo "Updated Artifacts.toml contents:"
         cat Artifacts.toml
-        
+
         echo "Successfully updated Artifacts.toml with version $version"
 
     - name: Commit and push changes
