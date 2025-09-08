@@ -18,7 +18,7 @@ on:
       targets:
         description: 'Target platforms to build for (comma-separated)'
         required: false
-        default: 'x86_64-linux-gnu'
+        default: 'x86_64-linux-gnu,aarch64-apple-darwin'
         type: string
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    
+
     steps:
     - name: Print workflow inputs
       run: |
@@ -51,13 +51,13 @@ jobs:
           echo "Error: Cannot create a branch named 'main'."
           exit 1
         fi
-        
+
         # Check if branch already exists
         if git ls-remote --heads origin "$branch_name" | grep -q "$branch_name"; then
           echo "Error: Branch '$branch_name' already exists. Please choose a different branch name."
           exit 1
         fi
-        
+
         echo "Branch name validation passed: $branch_name"
 
     - name: Create and checkout new branch
@@ -81,17 +81,17 @@ jobs:
         base_version="${{ github.event.inputs.base_version }}"
         commit_sha="${{ github.event.inputs.commit_sha }}"
         new_version="${base_version}"
-        
+
         echo "Using provided commit SHA: $commit_sha"
-        
+
         echo "Updating build_tarballs.jl with version: $new_version and commit SHA: $commit_sha"
-        
+
         # Update the version line in build_tarballs.jl
         sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
-        
+
         # Update the GitSource commit SHA in build_tarballs.jl
         sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"$commit_sha\")/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
-        
+
         echo "Updated build_tarballs.jl:"
         echo "Version:"
         grep "version = v" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
@@ -111,11 +111,18 @@ jobs:
         BINARYBUILDER_AUTOMATIC_APPLE: true
         BINARYBUILDER_RUNNER: true
 
-    - name: Update Artifacts.toml with new release URLs and hashes
+    - name: Update Project.toml and Artifacts.toml with new version and release URLs
       run: |
         # Get the version from the build_tarballs.jl file
         version=$(grep 'version = v"' iceberg_rust_ffi_binarybuilder/build_tarballs.jl | sed 's/.*version = v"\([^"]*\)".*/\1/')
         echo "Detected version: $version"
+        
+        # Update Project.toml with new version
+        new_project_version="${version}+0"
+        echo "Updating Project.toml with version: $new_project_version"
+        sed -i "s/version = \"[^\"]*\"/version = \"$new_project_version\"/" Project.toml
+        echo "Updated Project.toml version:"
+        grep "version =" Project.toml
 
         echo "Building JLL"
         julia --project=iceberg_rust_ffi_binarybuilder iceberg_rust_ffi_binarybuilder/build_tarballs.jl --verbose --deploy-jll="local" ${{ github.event.inputs.targets }} --skip-build
@@ -123,7 +130,7 @@ jobs:
         cp ~/.julia/dev/iceberg_rust_ffi_jll/Artifacts.toml Artifacts.toml
 
         targets="${{ github.event.inputs.targets }}"
-        
+
         # Check if x86_64-linux-gnu is in targets and apply sed if it is
         if echo "$targets" | grep -q "x86_64-linux-gnu"; then
           echo "x86_64-linux-gnu found in targets, updating Artifacts.toml"
@@ -156,6 +163,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add Artifacts.toml iceberg_rust_ffi_binarybuilder/build_tarballs.jl
-        git commit -m "Update build_tarballs.jl version and Artifacts.toml with new tarball URLs"
-        git push origin ${{ github.event.inputs.branch_name }} 
+        git add Artifacts.toml Project.toml iceberg_rust_ffi_binarybuilder/build_tarballs.jl
+        git commit -m "Update build_tarballs.jl version, Project.toml version, and Artifacts.toml with new tarball URLs"
+        git push origin ${{ github.event.inputs.branch_name }}
