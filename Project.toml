@@ -1,6 +1,6 @@
 name = "iceberg_rust_ffi_jll"
 uuid = "6bd5c94f-693c-53e3-983d-a09fad412f22"
-version = "0.1.0+0"
+version = "0.2.5+0"
 
 [deps]
 Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
