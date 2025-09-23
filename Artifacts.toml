@@ -1,17 +1,17 @@
 [[iceberg_rust_ffi]]
+arch = "aarch64"
+git-tree-sha1 = "66bb5ce4aeca34b0661eb8237207175cf142ec37"
+os = "macos"
+
+    [[iceberg_rust_ffi.download]]
+    sha256 = "231963ddc22b620a7e4121373b98068fcf495f6d2aae5d922cd0a3e5f98986d0"
+    url = "https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v0.2.9%2B0/iceberg_rust_ffi.v0.2.9.aarch64-apple-darwin.tar.gz"
+[[iceberg_rust_ffi]]
 arch = "x86_64"
-git-tree-sha1 = "5970fd65d3ea8d73c0491b35fcdb3d94aa8205c4"
+git-tree-sha1 = "15983c5582c984594667a391ca511ddcd594e507"
 libc = "glibc"
 os = "linux"
 
     [[iceberg_rust_ffi.download]]
-    sha256 = "680215aae0ce2d06fa8ce184e48ca0d7f6de660063a40151a300a7cc6198aa3a"
-    url = "https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.x86_64-linux-gnu.tar.gz"
-[[iceberg_rust_ffi]]
-arch = "aarch64"
-git-tree-sha1 = "f5202bdb3704e2c4c461c51ce4e5a1a90000c650"
-os = "macos"
-
-    [[iceberg_rust_ffi.download]]
-    sha256 = "b62207f943deabcbc34995e35c2d17cae1c0f1376896a190c8c1b0d67719055f"
-    url = "https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/v0.1.0-alpha/iceberg_rust_ffi.v0.1.0.aarch64-apple-darwin.tar.gz"
+    sha256 = "f9d7265cdc267fa63f454ca97eced5de599d600aadaf24a883ddeae8a3adb03f"
+    url = "https://github.com/RelationalAI/iceberg_rust_ffi_jll.jl/releases/download/iceberg_rust_ffi-v0.2.9%2B0/iceberg_rust_ffi.v0.2.9.x86_64-linux-gnu.tar.gz"
