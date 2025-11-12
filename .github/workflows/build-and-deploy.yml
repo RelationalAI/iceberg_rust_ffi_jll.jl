@@ -90,7 +90,7 @@ jobs:
         sed -i "s/version = v\"[^\"]*\"/version = v\"$new_version\"/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
 
         # Update the GitSource commit SHA in build_tarballs.jl
-        sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/iceberg_rust_ffi.git\", \"$commit_sha\")/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
+        sed -i "s/GitSource(\"https:\/\/github.com\/RelationalAI\/RustyIceberg.jl.git\", \"[a-f0-9]*\")/GitSource(\"https:\/\/github.com\/RelationalAI\/RustyIceberg.jl.git\", \"$commit_sha\")/" iceberg_rust_ffi_binarybuilder/build_tarballs.jl
 
         echo "Updated build_tarballs.jl:"
         echo "Version:"
@@ -116,7 +116,7 @@ jobs:
         # Get the version from the build_tarballs.jl file
         version=$(grep 'version = v"' iceberg_rust_ffi_binarybuilder/build_tarballs.jl | sed 's/.*version = v"\([^"]*\)".*/\1/')
         echo "Detected version: $version"
-        
+
         # Update Project.toml with new version
         new_project_version="${version}+0"
         echo "Updating Project.toml with version: $new_project_version"

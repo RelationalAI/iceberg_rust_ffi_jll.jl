@@ -22,7 +22,7 @@ The workflow updates two fields in `build_tarballs.jl`:
    - Example: If base_version is "0.1.0" and branch_name is "feature/new-version", it becomes `version = v"0.1.0-feature/new-version"`
 
 2. **GitSource commit SHA**: Updates the commit SHA in the GitSource line to the current commit
-   - Example: `GitSource("https://github.com/RelationalAI/iceberg_rust_ffi.git", "abc123...")` gets updated with the current commit SHA
+   - Example: `GitSource("https://github.com/RelationalAI/RustyIceberg.jl.git", "abc123...")` gets updated with the current commit SHA
 
 ## Parameters
 
@@ -45,7 +45,7 @@ The workflow updates two fields in `build_tarballs.jl`:
 - **Required**: No
 - **Default**: `x86_64-linux-gnu`
 - **Type**: String
-- **Examples**: 
+- **Examples**:
   - `x86_64-linux-gnu` (single target)
   - `x86_64-linux-gnu,aarch64-apple-darwin` (multiple targets)
 
@@ -80,4 +80,4 @@ The workflow requires the following permissions:
 
 The workflow sets the following environment variables for BinaryBuilder:
 - `BINARYBUILDER_AUTOMATIC_APPLE: true` - Enables automatic Apple platform handling
-- `BINARYBUILDER_RUNNER: true` - Enables BinaryBuilder runner mode 
+- `BINARYBUILDER_RUNNER: true` - Enables BinaryBuilder runner mode
