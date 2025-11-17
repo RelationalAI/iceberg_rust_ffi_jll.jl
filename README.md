@@ -4,7 +4,7 @@ This is a *custom* version of https://github.com/JuliaBinaryWrappers/iceberg_rus
 The custom version is intended for internal use when you want to build a custom version the JLL. In order to do that, run the `build-and-deploy` workflow, and it will:
 
 * Modify `iceberg_rust_ffi_binarybuilder/build_tarballs.jl` with the passed in version and commit SHA of the https://github.com/RelationalAI/iceberg_rust_ffi repo.
-* Deploy a new release. Make sure to pass in unique version number to the GitHub workflow.
+* Deploy a new release. Make sure to pass in unique version number to the GitHub workflow. Follow the action logs to be able to authenticate with the device code. This happens near the beginning of the action (first few minutes).
 * Produce a new branch with JLLWrappers around the artifacts in that release
 * After that you may have to manually edit Artifacts.toml either to delete config for unused platforms, or to edit it to be correct for the platforms that the script didn't handle (right now it can handle `aarch64-apple-darwin` and `x86_64-linux-gnu`).
 
