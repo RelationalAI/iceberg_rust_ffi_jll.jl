@@ -22,6 +22,10 @@ which cargo || echo "cargo not found in PATH"
 rustc --version || echo "rustc --version failed"
 rustup show || echo "rustup show failed"
 
+echo "=== Removing old toolchain to free disk space ==="
+rustup toolchain uninstall ${RUSTUP_TOOLCHAIN} 2>&1 || echo "uninstall failed with exit code $?"
+df -h / /tmp 2>/dev/null || true
+
 echo "=== Attempting rustup install 1.92.0 ==="
 rustup install 1.92.0 2>&1 || echo "rustup install failed with exit code $?"
 
