@@ -24,19 +24,19 @@ curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-musl/rus
 chmod +x /workspace/rustup-init
 /workspace/rustup-init -y --default-toolchain 1.92.0 --no-modify-path 2>&1
 
-# Put the new cargo/rustc on PATH ahead of wrappers
-export PATH="${CARGO_HOME}/bin:${PATH}"
-unset RUSTUP_TOOLCHAIN
+# Add cross-compilation target
+${CARGO_HOME}/bin/rustup target add ${rust_target} 2>&1 || true
+
+# Point BinaryBuilder's wrappers to the new toolchain (DON'T change PATH)
+export RUSTUP_TOOLCHAIN=1.92.0
 
 echo "=== Verify ==="
-which rustc
 rustc --version
-which cargo
 cargo --version
 
 cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
 
-cargo rustc --release --lib --crate-type=cdylib --target=${rust_target}
+cargo rustc --release --lib --crate-type=cdylib
 
 # Install the library
 install -Dvm 755 "target/${rust_target}/release/libiceberg_rust_ffi.${dlext}" "${libdir}/libiceberg_rust_ffi.${dlext}"
