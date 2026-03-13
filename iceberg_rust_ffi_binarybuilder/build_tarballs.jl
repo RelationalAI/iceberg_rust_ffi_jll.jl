@@ -11,7 +11,14 @@ sources = [
 script = raw"""
 cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
 
-# Build the library with native compilation
+# Install and use a custom Rust version not bundled with BinaryBuilderBase
+echo "Current rustc version: $(rustc --version)"
+echo "RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN:-unset}"
+echo "RUSTUP_HOME=${RUSTUP_HOME:-unset}"
+rustup install 1.92.0 || echo "rustup install failed with exit code $?"
+export RUSTUP_TOOLCHAIN=1.92.0
+echo "After override rustc version: $(rustc --version)"
+
 cargo rustc --release --lib --crate-type=cdylib
 
 # Install the library
