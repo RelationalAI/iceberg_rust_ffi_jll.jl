@@ -19,8 +19,10 @@ export RUSTUP_HOME=/workspace/rustup
 export CARGO_HOME=/workspace/cargo
 mkdir -p ${RUSTUP_HOME} ${CARGO_HOME}/bin
 
-# Use the existing rustup binary to bootstrap into the new RUSTUP_HOME
-/opt/x86_64-linux-musl/bin/rustup-init -y --default-toolchain 1.92.0 --no-modify-path 2>&1
+# Download rustup-init and install Rust 1.92.0 into /workspace
+curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-musl/rustup-init -o /workspace/rustup-init
+chmod +x /workspace/rustup-init
+/workspace/rustup-init -y --default-toolchain 1.92.0 --no-modify-path 2>&1
 
 # Put the new cargo/rustc on PATH ahead of wrappers
 export PATH="${CARGO_HOME}/bin:${PATH}"
