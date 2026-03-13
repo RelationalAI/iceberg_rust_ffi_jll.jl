@@ -9,15 +9,27 @@ sources = [
 
 # Bash recipe for building across all platforms
 script = raw"""
-cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
+set -x
 
-# Install and use a custom Rust version not bundled with BinaryBuilderBase
-echo "Current rustc version: $(rustc --version)"
-echo "RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN:-unset}"
+echo "=== Environment ==="
 echo "RUSTUP_HOME=${RUSTUP_HOME:-unset}"
-rustup install 1.92.0 || echo "rustup install failed with exit code $?"
+echo "RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN:-unset}"
+echo "CARGO_HOME=${CARGO_HOME:-unset}"
+echo "PATH=${PATH}"
+which rustc || echo "rustc not found in PATH"
+which rustup || echo "rustup not found in PATH"
+which cargo || echo "cargo not found in PATH"
+rustc --version || echo "rustc --version failed"
+rustup show || echo "rustup show failed"
+
+echo "=== Attempting rustup install 1.92.0 ==="
+rustup install 1.92.0 2>&1 || echo "rustup install failed with exit code $?"
+
+echo "=== Overriding RUSTUP_TOOLCHAIN ==="
 export RUSTUP_TOOLCHAIN=1.92.0
-echo "After override rustc version: $(rustc --version)"
+rustc --version || echo "rustc --version failed after override"
+
+cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
 
 cargo rustc --release --lib --crate-type=cdylib
 
