@@ -9,33 +9,9 @@ sources = [
 
 # Bash recipe for building across all platforms
 script = raw"""
-set -x
-
-echo "=== Disk space ==="
-df -h / /workspace /tmp 2>/dev/null || true
-
-echo "=== Installing Rust 1.92.0 to /workspace (host-mounted, more disk space) ==="
-export RUSTUP_HOME=/workspace/rustup
-export CARGO_HOME=/workspace/cargo
-mkdir -p ${RUSTUP_HOME} ${CARGO_HOME}/bin
-
-# Download rustup-init and install Rust 1.92.0 into /workspace
-curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-musl/rustup-init -o /workspace/rustup-init
-chmod +x /workspace/rustup-init
-/workspace/rustup-init -y --default-toolchain 1.92.0 --no-modify-path 2>&1
-
-# Add cross-compilation target
-${CARGO_HOME}/bin/rustup target add ${rust_target} 2>&1 || true
-
-# Point BinaryBuilder's wrappers to the new toolchain (DON'T change PATH)
-export RUSTUP_TOOLCHAIN=1.92.0
-
-echo "=== Verify ==="
-rustc --version
-cargo --version
-
 cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
 
+# Build the library with native compilation
 cargo rustc --release --lib --crate-type=cdylib
 
 # Install the library
