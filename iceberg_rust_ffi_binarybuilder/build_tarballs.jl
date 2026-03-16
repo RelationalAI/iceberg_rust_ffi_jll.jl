@@ -11,30 +11,31 @@ sources = [
 script = raw"""
 set -x
 
-echo "=== Disk space ==="
-df -h / /workspace /tmp 2>/dev/null || true
+echo "=== Environment ==="
+echo "RUSTUP_HOME=${RUSTUP_HOME:-unset}"
+echo "RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN:-unset}"
+echo "CARGO_HOME=${CARGO_HOME:-unset}"
+echo "PATH=${PATH}"
+which rustc || echo "rustc not found in PATH"
+which rustup || echo "rustup not found in PATH"
+which cargo || echo "cargo not found in PATH"
+rustc --version || echo "rustc --version failed"
+rustup show || echo "rustup show failed"
 
-echo "=== Installing Rust 1.92.0 to /workspace (host-mounted, more disk space) ==="
-export RUSTUP_HOME=/workspace/rustup
-export CARGO_HOME=/workspace/cargo
-mkdir -p ${RUSTUP_HOME} ${CARGO_HOME}/bin
+echo "=== Removing old toolchain to free disk space ==="
+rustup toolchain uninstall ${RUSTUP_TOOLCHAIN} 2>&1 || echo "uninstall failed with exit code $?"
+df -h / /tmp 2>/dev/null || true
 
-# Use the existing rustup binary to bootstrap into the new RUSTUP_HOME
-/opt/x86_64-linux-musl/bin/rustup-init -y --default-toolchain 1.92.0 --no-modify-path 2>&1
+echo "=== Attempting rustup install 1.92.0 ==="
+rustup install 1.92.0 2>&1 || echo "rustup install failed with exit code $?"
 
-# Put the new cargo/rustc on PATH ahead of wrappers
-export PATH="${CARGO_HOME}/bin:${PATH}"
-unset RUSTUP_TOOLCHAIN
-
-echo "=== Verify ==="
-which rustc
-rustc --version
-which cargo
-cargo --version
+echo "=== Overriding RUSTUP_TOOLCHAIN ==="
+export RUSTUP_TOOLCHAIN=1.92.0
+rustc --version || echo "rustc --version failed after override"
 
 cd ${WORKSPACE}/srcdir/RustyIceberg.jl/iceberg_rust_ffi/
 
-cargo rustc --release --lib --crate-type=cdylib --target=${rust_target}
+cargo rustc --release --lib --crate-type=cdylib
 
 # Install the library
 install -Dvm 755 "target/${rust_target}/release/libiceberg_rust_ffi.${dlext}" "${libdir}/libiceberg_rust_ffi.${dlext}"
